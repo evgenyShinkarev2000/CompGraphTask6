@@ -1,0 +1,39 @@
+﻿<Window x:Class="Task6.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Task6"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.RenderTransform>
+        <Grid Width="200">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="CommandComboBox" Grid.Row="0">
+            </ComboBox>
+            <ComboBox x:Name="FillColorComboBox" Grid.Row="1">
+            </ComboBox>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="ClearButton" Content="Очистить" Margin="5" Click="ClearButton_Click"/>
+                <Separator Width="70" Background="Transparent"></Separator>
+                <Button x:Name="DrawButton" Content="Рисовать" Margin="5" Click="DrawButton_Click"/>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</Window>
