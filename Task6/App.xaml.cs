@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace Task6
 {
@@ -13,5 +16,18 @@ namespace Task6
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            SetInvariantCulture();
+            base.OnStartup(e);
+        }
+
+        private void SetInvariantCulture()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-IN");
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-IN");
+            FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(
+                        XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using OpenTK.Mathematics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Task6.Interfaces
 {
-    internal interface IFillColor
+    public interface IInitializableCommand : IMyCommand
     {
-        public Color4 FillColor { get; set; }
+        public IEnumerable<IMyCommand> Init(CommandInitializer visitor);
     }
 }

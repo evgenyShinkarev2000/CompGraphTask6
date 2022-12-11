@@ -6,21 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Task6.Commands;
 using Task6.Interfaces;
 
 namespace Task6.Painters
 {
-    public class PoligonPainter : IComboBoxCommand
+    public class DrawArbitaryPoligon : IDrawFigureCommand
     {
         public readonly List<Vector3> Vectors = new List<Vector3>();
-        public string CommandName => "Полигон";
-        public Color4 FillColor { get; set; } = Color4.White;
-        public PoligonPainter() { }
+        public string Name => "Произвольный полигон";
+        public DrawArbitaryPoligon() { }
 
         public void Execute()
         {
             GL.Begin(PrimitiveType.Polygon);
-            GL.Color4(FillColor);
             foreach(var vector in Vectors)
             {
                 GL.Vertex3(vector);
@@ -28,7 +27,10 @@ namespace Task6.Painters
             GL.End();
         }
 
-        public PoligonPainter WithVectors(Vector3[] vectors)
+        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
+            => visitor.Visit(this);
+
+        public DrawArbitaryPoligon WithVectors(IEnumerable<Vector3> vectors)
         {
             Vectors.Clear();
             Vectors.AddRange(vectors);

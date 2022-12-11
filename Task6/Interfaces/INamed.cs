@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Task6.Interfaces
 {
-    internal interface INamedCommand : IPaintCommand
+    public interface INamed : IMyCommand
     {
-        public string CommandName { get; }
+        public string Name { get; }
     }
 }

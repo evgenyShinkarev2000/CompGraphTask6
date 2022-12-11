@@ -4,21 +4,23 @@ using OpenTK.Mathematics;
 using OpenTK.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Task6.Commands;
+using Task6.Extensions;
 using Task6.Interfaces;
 using Task6.Painters;
 
@@ -31,102 +33,127 @@ namespace Task6
     {
         public readonly GLWindow game = new GLWindow();
         public readonly GLWpfControl gameControl;
+        private readonly CommandInitializer commandInitializer;
+        private readonly InitCommandSettingProvider initCommandSettingProvider;
         public MainWindow()
         {
             gameControl = game.OpenTkControl;
             InitializeComponent();
             InitializeCustom();
+            initCommandSettingProvider = new InitCommandSettingProvider(this);
+            commandInitializer = new CommandInitializer(initCommandSettingProvider);
             game.Show();
         }
 
         private void InitializeCustom()
         {
             this.CommandComboBox.SetNamedItems(
-                DIContainer.standartKernel.GetAll<IComboBoxCommand>()
-                .Select(command => new NamedItem<IComboBoxCommand>(command, command.CommandName)));
+                DIContainer.standartKernel.GetAll<IDrawFigureCommand>()
+                .Select(command => new NamedItem<IDrawFigureCommand>(command, command.Name)));
 
             this.FillColorComboBox.SetNamedItems(Color4Extension.GetColorWithName());
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            game.PaintCommands.Add(new Cleaner());
+            game.Commands.AddRange(new IMyCommand[] {
+                new SetClearColor() { Color = Color4.DimGray },
+                new Fill() });
             gameControl.InvalidateVisual();
         }
 
         private void DrawButton_Click(object sender, RoutedEventArgs e)
         {
-            var command = this.CommandComboBox.GetSelected<IComboBoxCommand>()?.Item;
-            if (command != null)
+            var drawFigureCommand = initCommandSettingProvider.GetDrawFigureCommand();
+            if (drawFigureCommand != null)
             {
-                var fillColor = this.FillColorComboBox.GetSelected<Color4>()?.Item;
-                if (fillColor != null)
-                {
-                    command.FillColor = (Color4)fillColor;
-                    game.PaintCommands.Add(command);
-                }
+                game.Commands.AddRange(drawFigureCommand.Init(commandInitializer));
             }
             gameControl.InvalidateVisual();
         }
     }
-}
 
-public static class ComboBoxExtension
-{
-    public static NamedItem<T>? GetSelected<T>(this ComboBox comboBox)
+    public class CommandInitializer
     {
-        if (comboBox?.SelectedItem is ComboBoxItem comboBoxSelectedItem)
+        private readonly InitCommandSettingProvider settingProvider;
+        public CommandInitializer(InitCommandSettingProvider settingProvider)
         {
-            return comboBoxSelectedItem.DataContext is T 
-                ? new NamedItem<T>((T)comboBoxSelectedItem.DataContext, comboBoxSelectedItem.Content.ToString())
-                : null;
+            this.settingProvider = settingProvider;
         }
 
-        return null;
-    }
-
-    public static void SetNamedItems<T>(this ComboBox comboBox, IEnumerable<NamedItem<T>> namedItems)
-    {
-        foreach(var namedItem in namedItems)
+        public IEnumerable<IMyCommand> Visit(Fill clean)
         {
-            var comboBoxItem = new ComboBoxItem();
-            comboBoxItem.DataContext = namedItem.Item;
-            comboBoxItem.Content = namedItem.Name;
-            comboBox.Items.Add(comboBoxItem);
-        }
-    }
-}
-
-public static class Color4Extension
-{
-    private static NamedItem<Color4>[]? colorsCash = null;
-    public static NamedItem<Color4>[] GetColorWithName()
-    {
-        if (colorsCash != null)
-        {
-            return colorsCash.Select(c => c).ToArray();
+            return Visit(new SetClearColor()).Concat(new[] { clean });
         }
 
-        colorsCash = typeof(Color4).GetProperties(BindingFlags.Static | BindingFlags.Public)
-            .Select(propInfo =>
+        public IEnumerable<IMyCommand> Visit(DrawArbitaryPoligon drawArbitaryPoligon)
+        {
+            // do
+            yield return drawArbitaryPoligon;
+        }
+
+        public IEnumerable<IMyCommand> Visit(DrawRegularPoligon drawRegularPoligon)
+        {
+            //do
+            yield return drawRegularPoligon;
+        }
+
+        public IEnumerable<IMyCommand> Visit(Rotate rotate)
+        {
+            // do
+            yield return rotate;
+        }
+        public IEnumerable<IMyCommand> Visit(SetClearColor setClearColor)
+        {
+            var clearColor = settingProvider.GetFillColor(); // лень делать combobox для ClearColor
+            if (clearColor != null)
             {
-#pragma warning disable CS8605 // Unboxing a possibly null value.
-                return new NamedItem<Color4>((Color4)propInfo.GetValue(null), propInfo.Name);
-#pragma warning restore CS8605 // Unboxing a possibly null value.
-            }).ToArray();
+                setClearColor.Color = (Color4)clearColor;
+                yield return setClearColor;
+            }
+        }
 
-        return colorsCash.Select(c => c).ToArray();
+        public IEnumerable<IMyCommand> Visit(SetFillColor setFillColor)
+        {
+            var fillColor = settingProvider.GetFillColor();
+            if (fillColor != null)
+            {
+                setFillColor.Color = (Color4)fillColor;
+                yield return setFillColor;
+            }
+        }
+
+        public IEnumerable<IMyCommand> Visit(Translate translate)
+        {
+            // do
+            yield return translate;
+        }
     }
-}
 
-public class NamedItem<T>
-{
-    public readonly T Item;
-    public readonly string Name;
-
-    public NamedItem(T item, string name)
+    public class InitCommandSettingProvider
     {
-        Item = item;
-        Name = name;
+        private readonly MainWindow mainWindow;
+        public InitCommandSettingProvider(MainWindow mainWindow)
+        {
+            this.mainWindow = mainWindow;
+        }
+
+        public IDrawFigureCommand? GetDrawFigureCommand()
+            => mainWindow.CommandComboBox.GetSelected<IDrawFigureCommand>()?.Item;
+
+
+        public Color4? GetFillColor()
+           => mainWindow.FillColorComboBox.GetSelected<Color4>()?.Item;
+
+        public Color4? GetClearColor() => Color4.DimGray;
+
+
+        public Vector3 GetCenter()
+        {
+            return new Vector3(
+                mainWindow.XNumeric.GetFloatOrDefault(),
+                mainWindow.YNumeric.GetFloatOrDefault(),
+                mainWindow.ZNumeric.GetFloatOrDefault());
+        }
     }
 }

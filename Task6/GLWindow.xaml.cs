@@ -25,26 +25,26 @@ namespace Task6
     /// </summary>
     public partial class GLWindow : Window
     {
-        internal readonly List<IPaintCommand> PaintCommands = new List<IPaintCommand>();
+        internal readonly List<IMyCommand> Commands = new List<IMyCommand>();
         public GLWindow()
         {
             InitializeComponent();
             OpenTkControl.Start(new GLWpfControlSettings() { MajorVersion = 2, MinorVersion = 1, RenderContinuously = false });
-            PaintCommands.Add(new Cleaner());
-            PaintCommands.Add(new PoligonPainter().WithVectors(new[] { new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(1, -1, -0.5f) }));
+            Commands.Add(new Fill());
+            Commands.Add(new DrawArbitaryPoligon().WithVectors(new[] { new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(1, -1, -0.5f) }));
             OpenTkControl.InvalidateVisual();
         }
 
         public void OpenTkControl_OnRender(TimeSpan delta)
         {
-            if (PaintCommands.Count > 0)
+            if (Commands.Count > 0)
             {
-                foreach (var painter in PaintCommands)
+                foreach (var painter in Commands)
                 {
                     painter.Execute();
                 }
             }
-            PaintCommands.Clear();
+            Commands.Clear();
         }
     }
 }

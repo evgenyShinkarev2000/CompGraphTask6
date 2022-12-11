@@ -1,6 +1,6 @@
 ﻿namespace Task6.Interfaces
 {
-    internal interface IPaintCommand
+    public interface IMyCommand
     {
         void Execute();
     }

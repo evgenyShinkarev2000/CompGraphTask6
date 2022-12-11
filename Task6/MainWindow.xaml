@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Task6"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -15,25 +16,24 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.RenderTransform>
-        <Grid Width="200">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <ComboBox x:Name="CommandComboBox" Grid.Row="0">
+        <StackPanel VerticalAlignment="Center">
+            <ComboBox x:Name="CommandComboBox">
             </ComboBox>
-            <ComboBox x:Name="FillColorComboBox" Grid.Row="1">
+            <ComboBox x:Name="FillColorComboBox">
             </ComboBox>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
-                <Button x:Name="ClearButton" Content="Очистить" Margin="5" Click="ClearButton_Click"/>
-                <Separator Width="70" Background="Transparent"></Separator>
-                <Button x:Name="DrawButton" Content="Рисовать" Margin="5" Click="DrawButton_Click"/>
+            <StackPanel Orientation="Horizontal">
+                <Label>X</Label>
+                <xctk:DoubleUpDown x:Name="XNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <Label>Y</Label>
+                <xctk:DoubleUpDown x:Name="YNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <Label>Z</Label>
+                <xctk:DoubleUpDown x:Name="ZNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+            </StackPanel>            
+                <StackPanel Orientation="Horizontal">
+                <Button x:Name="ClearButton" Content="Очистить" Click="ClearButton_Click" HorizontalAlignment="Left"/>
+                <Separator Width="90" Visibility="Hidden"></Separator>
+                <Button x:Name="DrawButton" Content="Рисовать" Click="DrawButton_Click" HorizontalAlignment="Right"/>
             </StackPanel>
-
-        </Grid>
+        </StackPanel>
     </Grid>
 </Window>
