@@ -20,8 +20,5 @@ namespace Task6.Painters
         {
             GL.Translate(x, y, z);
         }
-
-        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
-            => visitor.Visit(this);
     }
 }

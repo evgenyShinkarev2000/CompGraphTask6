@@ -31,6 +31,7 @@ namespace Task6
         public Matrix4 RotationY = Matrix4.Identity;
         public Matrix4 Translation = Matrix4.Identity;
         public Matrix4 Final = Matrix4.Identity;
+        public Color4 ClearColor = Color4.Black;
         private readonly List<IMyCommand> previousCommands = new List<IMyCommand>();
         private Vector2 deltaCamera;
         private Vector2 TranslateDelta;
@@ -47,9 +48,10 @@ namespace Task6
 
         public void OpenTkControl_OnRender(TimeSpan delta)
         {
-            new Fill().Execute();
             Final = RotationX * RotationY * Translation;
             GL.LoadMatrix(ref Final);
+            GL.ClearColor(ClearColor);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
             foreach (var painter in Commands)
             {
                 painter.Execute();

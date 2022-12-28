@@ -16,8 +16,5 @@ namespace Task6.Commands
         {
             GL.ClearColor(Color);
         }
-
-        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
-            => visitor.Visit(this);
     }
 }

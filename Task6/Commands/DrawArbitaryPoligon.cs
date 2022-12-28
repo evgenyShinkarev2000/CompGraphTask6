@@ -26,10 +26,6 @@ namespace Task6.Painters
             }
             GL.End();
         }
-
-        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
-            => visitor.Visit(this);
-
         public DrawArbitaryPoligon WithVectors(IEnumerable<Vector3> vectors)
         {
             Vectors.Clear();

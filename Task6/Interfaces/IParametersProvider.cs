@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Task6.Interfaces
 {
-    public interface IInitializableCommand : IMyCommand
+    internal interface IParametersProvider<out T>
     {
+        T GetParameters();
     }
 }

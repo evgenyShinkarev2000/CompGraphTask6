@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Task6.Interfaces;
 
 namespace Task6
@@ -15,7 +16,6 @@ namespace Task6
         public static readonly StandardKernel standartKernel = new StandardKernel();
         static DIContainer()
         {
-            standartKernel.Bind(x => x.FromThisAssembly().SelectAllClasses().InheritedFrom<IDrawFigureCommand>().BindAllInterfaces());
         }
     }
 }

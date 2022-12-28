@@ -21,8 +21,5 @@ namespace Task6.Painters
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
         }
-
-        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
-            => visitor.Visit(this);
     }
 }

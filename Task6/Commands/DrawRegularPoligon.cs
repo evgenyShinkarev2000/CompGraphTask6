@@ -40,10 +40,6 @@ namespace Task6.Painters
             }
             GL.End();
         }
-
-        public IEnumerable<IMyCommand> Init(CommandInitializer visitor)
-            => visitor.Visit(this);
-
         private Vector2 RollVectorRight(double angle, Vector2 vector)
         {
             return new Vector2(

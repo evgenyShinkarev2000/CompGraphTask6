@@ -1,28 +1,18 @@
 ﻿using Ninject;
-using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Wpf;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Task6.Commands;
+using Ninject.Extensions.Conventions;
 using Task6.Extensions;
 using Task6.Interfaces;
 using Task6.Painters;
+using Task6.Parameters;
+using System.Windows.Controls;
+using OpenTK.Graphics.OpenGL;
 
 namespace Task6
 {
@@ -33,25 +23,42 @@ namespace Task6
     {
         public readonly GLWindow game = new GLWindow();
         public readonly GLWpfControl gameControl;
-        private readonly CommandInitializer commandInitializer;
-        private readonly InitCommandSettingProvider initCommandSettingProvider;
+        private Dictionary<Type, FrameworkElement[]> paramPairsControl = new Dictionary<Type, FrameworkElement[]>();
         public MainWindow()
         {
+            InitDIContainer();
             gameControl = game.OpenTkControl;
             InitializeComponent();
             InitializeCustom();
-            initCommandSettingProvider = new InitCommandSettingProvider(this);
-            commandInitializer = new CommandInitializer(initCommandSettingProvider);
+
             game.Show();
+        }
+
+        public void InitDIContainer()
+        {
+            DIContainer.standartKernel
+                .Bind(x => x.FromThisAssembly().SelectAllClasses().InheritedFrom<IDrawFigureCommand>().BindAllInterfaces());
+            DIContainer.standartKernel.Bind<RotateParams>().ToMethod(context => GetRotate());
+            DIContainer.standartKernel.Bind<TranslateParams>().ToMethod(context => GetCenter());
+            DIContainer.standartKernel.Bind<FillColorParams>().ToMethod(context => GetFillColor());
+            DIContainer.standartKernel.Bind<SidesCountParams>().ToMethod(context => GetSidesCount());
+            DIContainer.standartKernel.Bind<RadiusParams>().ToMethod(context => GetRadius());
         }
 
         private void InitializeCustom()
         {
-            this.CommandComboBox.SetNamedItems(
-                DIContainer.standartKernel.GetAll<IDrawFigureCommand>()
+            var commands = DIContainer.standartKernel.GetAll<IDrawFigureCommand>().ToArray();
+            this.CommandComboBox.SetNamedItems(commands
                 .Select(command => new NamedItem<IDrawFigureCommand>(command, command.Name)));
 
             this.FillColorComboBox.SetNamedItems(Color4Extension.GetColorWithName());
+            HideInputControls();
+
+            paramPairsControl[typeof(RotateParams)] = new[] { RotateStackPanel };
+            paramPairsControl[typeof(TranslateParams)] = new[] { TranslateStackPanel };
+            paramPairsControl[typeof(FillColorParams)] = new[] { FillColorComboBox };
+            paramPairsControl[typeof(SidesCountParams)] = new[] { FigureFaceStackPanel };
+            paramPairsControl[typeof(RadiusParams)] = new[] { RadiusStackPanel }; 
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -64,13 +71,13 @@ namespace Task6
 
         private void DrawButton_Click(object sender, RoutedEventArgs e)
         {
-            var drawFigureCommand = initCommandSettingProvider.GetDrawFigureCommand();
+            var drawFigureCommand = GetDrawFigureType();
             if (drawFigureCommand != null)
             {
-                game.Commands.AddRange(commandInitializer.Visit(new Rotate()));
-                game.Commands.AddRange(commandInitializer.Visit(new Translate()));
-                game.Commands.AddRange(commandInitializer.Visit(new SetFillColor()));
-                game.Commands.AddRange(drawFigureCommand.Init(commandInitializer));
+                game.ClearColor = GetClearColor();
+                game.Commands.Add(DIContainer.standartKernel.Get<Rotate>());
+                game.Commands.Add(DIContainer.standartKernel.Get<Translate>());
+                game.Commands.Add((IDrawFigureCommand)DIContainer.standartKernel.Get(drawFigureCommand.GetType()));
                 game.Commands.Add(new CustomCommand(() =>
                 {
                     GL.LoadMatrix(ref game.Final);
@@ -78,119 +85,67 @@ namespace Task6
             }
             gameControl.InvalidateVisual();
         }
-    }
 
-    public class CommandInitializer
-    {
-        private readonly InitCommandSettingProvider settingProvider;
-        public CommandInitializer(InitCommandSettingProvider settingProvider)
+        private void OnSelectionCommandChange(object sender, SelectionChangedEventArgs e)
         {
-            this.settingProvider = settingProvider;
-        }
-
-        public IEnumerable<IMyCommand> Visit(Fill clean)
-        {
-            return Visit(new SetClearColor()).Concat(new[] { clean });
-        }
-
-        public IEnumerable<IMyCommand> Visit(DrawArbitaryPoligon drawArbitaryPoligon)
-        {
-            // do
-            yield return drawArbitaryPoligon;
-        }
-
-        public IEnumerable<IMyCommand> Visit(DrawRegularPoligon drawRegularPoligon)
-        {
-            drawRegularPoligon.Radius = settingProvider.GetRadius();
-            drawRegularPoligon.SidesCount = settingProvider.GetSidesCount();
-
-            yield return drawRegularPoligon;
-        }
-
-        public IEnumerable<IMyCommand> Visit(Rotate rotate)
-        {
-            var rotateParams = settingProvider.GetRotate();
-            rotate.angle = rotateParams.Angle;
-            rotate.x = rotateParams.Direction.X;
-            rotate.y = rotateParams.Direction.Y;
-            rotate.z = rotateParams.Direction.Z;
-
-            yield return rotate;
-        }
-        public IEnumerable<IMyCommand> Visit(SetClearColor setClearColor)
-        {
-            var clearColor = settingProvider.GetFillColor(); // лень делать combobox для ClearColor
-            if (clearColor != null)
+            var command = this.CommandComboBox.GetSelected<IDrawFigureCommand>()?.Item;
+            if (command == null)
             {
-                setClearColor.Color = (Color4)clearColor;
-                yield return setClearColor;
+                return;
+            }
+
+            HideInputControls();
+            var requiredParameters = command.GetType().GetConstructors().First().GetParameters()
+                .Select(p => p.ParameterType).ToArray();
+            foreach (var parameter in requiredParameters)
+            {
+                foreach (var inputControl in paramPairsControl[parameter])
+                {
+                    inputControl.Visibility = Visibility.Visible;
+                }
             }
         }
 
-        public IEnumerable<IMyCommand> Visit(SetFillColor setFillColor)
+        private void HideInputControls()
         {
-            var fillColor = settingProvider.GetFillColor();
-            if (fillColor != null)
+            foreach (var control in this.ControlsStackPanel.Children.OfType<FrameworkElement>())
             {
-                setFillColor.Color = (Color4)fillColor;
-                yield return setFillColor;
+                control.Visibility = Visibility.Collapsed;
             }
+            this.CommandComboBox.Visibility = Visibility.Visible;
+            this.ButtonsStackPanel.Visibility = Visibility.Visible;
         }
 
-        public IEnumerable<IMyCommand> Visit(Translate translate)
+        private IDrawFigureCommand? GetDrawFigureType()
+            => CommandComboBox.GetSelected<IDrawFigureCommand>()?.Item;
+
+
+        private FillColorParams GetFillColor()
+           => new FillColorParams(FillColorComboBox.GetSelected<Color4>()?.Item ?? new Color4());
+
+        private Color4 GetClearColor() => this.ClearColorComboBox.GetSelected<Color4>()?.Item ?? Color4.Black;
+
+
+        private TranslateParams GetCenter()
         {
-            var center = settingProvider.GetCenter();
-            translate.x = center.X;
-            translate.y = center.Y;
-            translate.z = center.Z;
-            yield return translate;
+            return new TranslateParams(new Vector3(
+                XTranslateNumeric.GetFloatOrDefault(),
+                YTranslateNumeric.GetFloatOrDefault(),
+                ZTranslateNumeric.GetFloatOrDefault()));
         }
 
-        public IEnumerable<IMyCommand> Visit(DrawParallelepiped drawParallelepiped)
+        private RadiusParams GetRadius()
+            => new RadiusParams(Radius1Numeric.GetFloatOrDefault());
+
+        private SidesCountParams GetSidesCount()
+            => new SidesCountParams(SidesCountNumeric.Value ?? 0);
+
+        private RotateParams GetRotate()
         {
-            yield return drawParallelepiped;
-        }
-    }
-
-    public class InitCommandSettingProvider
-    {
-        private readonly MainWindow mainWindow;
-        public InitCommandSettingProvider(MainWindow mainWindow)
-        {
-            this.mainWindow = mainWindow;
-        }
-
-        public IDrawFigureCommand? GetDrawFigureCommand()
-            => mainWindow.CommandComboBox.GetSelected<IDrawFigureCommand>()?.Item;
-
-
-        public Color4? GetFillColor()
-           => mainWindow.FillColorComboBox.GetSelected<Color4>()?.Item;
-
-        public Color4? GetClearColor() => Color4.DimGray;
-
-
-        public Vector3 GetCenter()
-        {
-            return new Vector3(
-                mainWindow.XTranslateNumeric.GetFloatOrDefault(),
-                mainWindow.YTranslateNumeric.GetFloatOrDefault(),
-                mainWindow.ZTranslateNumeric.GetFloatOrDefault());
-        }
-
-        public float GetRadius() 
-            => mainWindow.Radius1Numeric.GetFloatOrDefault();
-
-        public int GetSidesCount()
-            => mainWindow.SidesCountNumeric.Value ?? 0;
-
-        public (float Angle, Vector3 Direction) GetRotate()
-        {
-            return (mainWindow.AngleRotateNumeric.GetFloatOrDefault(),
-                new Vector3(
-                    mainWindow.XRotateNumeric.GetFloatOrDefault(),
-                    mainWindow.YRotateNumeric.GetFloatOrDefault(),
-                    mainWindow.ZRotateNumeric.GetFloatOrDefault()
+            return new RotateParams(AngleRotateNumeric.GetFloatOrDefault(), new Vector3(
+                    XRotateNumeric.GetFloatOrDefault(),
+                    YRotateNumeric.GetFloatOrDefault(),
+                    ZRotateNumeric.GetFloatOrDefault()
                     ));
         }
     }
