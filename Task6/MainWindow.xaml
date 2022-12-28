@@ -22,13 +22,30 @@
             <ComboBox x:Name="FillColorComboBox">
             </ComboBox>
             <StackPanel Orientation="Horizontal">
+                <Label>Позиция</Label>
                 <Label>X</Label>
-                <xctk:DoubleUpDown x:Name="XNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <xctk:DoubleUpDown x:Name="XTranslateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
                 <Label>Y</Label>
-                <xctk:DoubleUpDown x:Name="YNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <xctk:DoubleUpDown x:Name="YTranslateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
                 <Label>Z</Label>
-                <xctk:DoubleUpDown x:Name="ZNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
-            </StackPanel>            
+                <xctk:DoubleUpDown x:Name="ZTranslateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>Угол</Label>
+                <xctk:DoubleUpDown x:Name="AngleRotateNumeric" FormatString="f2" Value="0" Increment="10" Minimum="0" Maximum="360"></xctk:DoubleUpDown>
+                <Label>X</Label>
+                <xctk:DoubleUpDown x:Name="XRotateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <Label>Y</Label>
+                <xctk:DoubleUpDown x:Name="YRotateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+                <Label>Z</Label>
+                <xctk:DoubleUpDown x:Name="ZRotateNumeric" FormatString="f2" Value="0" Increment=".05" Minimum="-1.0" Maximum="1.0" Width="50"></xctk:DoubleUpDown>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>R1</Label>
+                <xctk:DoubleUpDown x:Name="Radius1Numeric" FormatString="f2" Value="0.5" Minimum="0" Maximum="1" Increment=".05"></xctk:DoubleUpDown>
+                <Label>Число граней</Label>
+                <xctk:IntegerUpDown x:Name="SidesCountNumeric" Value="3" Minimum="0" Maximum="32000"></xctk:IntegerUpDown>
+            </StackPanel>
                 <StackPanel Orientation="Horizontal">
                 <Button x:Name="ClearButton" Content="Очистить" Click="ClearButton_Click" HorizontalAlignment="Left"/>
                 <Separator Width="90" Visibility="Hidden"></Separator>

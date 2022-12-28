@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:Task6"
         xmlns:glWpfControl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="GLWindow" Height="450" Width="800">
+        Title="GLWindow" Height="800" Width="800"
+        MouseMove="OnMouseMove"
+        KeyDown="OnKeyDown"
+        >
     <Grid>
         <glWpfControl:GLWpfControl 
             x:Name="OpenTkControl" 

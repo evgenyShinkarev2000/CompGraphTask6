@@ -67,7 +67,14 @@ namespace Task6
             var drawFigureCommand = initCommandSettingProvider.GetDrawFigureCommand();
             if (drawFigureCommand != null)
             {
+                game.Commands.AddRange(commandInitializer.Visit(new Rotate()));
+                game.Commands.AddRange(commandInitializer.Visit(new Translate()));
+                game.Commands.AddRange(commandInitializer.Visit(new SetFillColor()));
                 game.Commands.AddRange(drawFigureCommand.Init(commandInitializer));
+                game.Commands.Add(new CustomCommand(() =>
+                {
+                    GL.LoadMatrix(ref game.Final);
+                }));
             }
             gameControl.InvalidateVisual();
         }
@@ -94,13 +101,20 @@ namespace Task6
 
         public IEnumerable<IMyCommand> Visit(DrawRegularPoligon drawRegularPoligon)
         {
-            //do
+            drawRegularPoligon.Radius = settingProvider.GetRadius();
+            drawRegularPoligon.SidesCount = settingProvider.GetSidesCount();
+
             yield return drawRegularPoligon;
         }
 
         public IEnumerable<IMyCommand> Visit(Rotate rotate)
         {
-            // do
+            var rotateParams = settingProvider.GetRotate();
+            rotate.angle = rotateParams.Angle;
+            rotate.x = rotateParams.Direction.X;
+            rotate.y = rotateParams.Direction.Y;
+            rotate.z = rotateParams.Direction.Z;
+
             yield return rotate;
         }
         public IEnumerable<IMyCommand> Visit(SetClearColor setClearColor)
@@ -125,8 +139,16 @@ namespace Task6
 
         public IEnumerable<IMyCommand> Visit(Translate translate)
         {
-            // do
+            var center = settingProvider.GetCenter();
+            translate.x = center.X;
+            translate.y = center.Y;
+            translate.z = center.Z;
             yield return translate;
+        }
+
+        public IEnumerable<IMyCommand> Visit(DrawParallelepiped drawParallelepiped)
+        {
+            yield return drawParallelepiped;
         }
     }
 
@@ -151,9 +173,25 @@ namespace Task6
         public Vector3 GetCenter()
         {
             return new Vector3(
-                mainWindow.XNumeric.GetFloatOrDefault(),
-                mainWindow.YNumeric.GetFloatOrDefault(),
-                mainWindow.ZNumeric.GetFloatOrDefault());
+                mainWindow.XTranslateNumeric.GetFloatOrDefault(),
+                mainWindow.YTranslateNumeric.GetFloatOrDefault(),
+                mainWindow.ZTranslateNumeric.GetFloatOrDefault());
+        }
+
+        public float GetRadius() 
+            => mainWindow.Radius1Numeric.GetFloatOrDefault();
+
+        public int GetSidesCount()
+            => mainWindow.SidesCountNumeric.Value ?? 0;
+
+        public (float Angle, Vector3 Direction) GetRotate()
+        {
+            return (mainWindow.AngleRotateNumeric.GetFloatOrDefault(),
+                new Vector3(
+                    mainWindow.XRotateNumeric.GetFloatOrDefault(),
+                    mainWindow.YRotateNumeric.GetFloatOrDefault(),
+                    mainWindow.ZRotateNumeric.GetFloatOrDefault()
+                    ));
         }
     }
 }
