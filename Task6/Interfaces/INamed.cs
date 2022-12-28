@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Task6.Interfaces
 {
-    public interface INamed : IMyCommand
+    public interface INamed
     {
         public string Name { get; }
     }

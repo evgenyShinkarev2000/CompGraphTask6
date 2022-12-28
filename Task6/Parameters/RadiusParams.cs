@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Task6.Parameters
 {
-    internal class RadiusParams
+    public class RadiusParams
     {
         public readonly float Radius;
         public RadiusParams(float radius)

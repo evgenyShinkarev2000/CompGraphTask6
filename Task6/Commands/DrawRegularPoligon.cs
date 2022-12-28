@@ -7,33 +7,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Task6.Interfaces;
+using Task6.Parameters;
 
 namespace Task6.Painters
 {
     public class DrawRegularPoligon : IDrawFigureCommand
     {
         public string Name => "Правильный многоугольник";
-        public float Radius { get; set; }
-        public int SidesCount
+        public SidesCountParams SidesCountParams { get; }
+        public RadiusParams RadiusParams { get; }
+        public FillColorParams FillColorParams { get; }
+        public DrawRegularPoligon(SidesCountParams sidesCountParams, RadiusParams radiusParams, FillColorParams fillColorParams)
         {
-            get => sidesCount; set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentException();
-                }
-
-                sidesCount = value;
-            }
+            SidesCountParams = sidesCountParams;
+            RadiusParams = radiusParams;
+            FillColorParams = fillColorParams;
         }
 
-        private int sidesCount;
         public void Execute()
         {
-            var currentPoint = new Vector2(0, Radius);
-            var angle = Math.PI * 2.0 * (1.0 / SidesCount);
+            var currentPoint = new Vector2(0, RadiusParams.Radius);
+            var angle = Math.PI * 2.0 * (1.0 / SidesCountParams.SidesCount);
             GL.Begin(PrimitiveType.Polygon);
-            foreach(var i in Enumerable.Range(0, sidesCount))
+            GL.Color4(FillColorParams.GetNextColor());
+            foreach(var i in Enumerable.Range(0, SidesCountParams.SidesCount))
             {
                 GL.Vertex2(currentPoint);
                 currentPoint = RollVectorRight(angle, currentPoint);

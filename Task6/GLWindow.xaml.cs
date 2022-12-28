@@ -41,9 +41,6 @@ namespace Task6
         {
             InitializeComponent();
             OpenTkControl.Start(new GLWpfControlSettings() { MajorVersion = 2, MinorVersion = 1, RenderContinuously = false });
-            Commands.Add(new Fill());
-            Commands.Add(new DrawArbitaryPoligon().WithVectors(new[] { new Vector3(0, 0, 0), new Vector3(1, 1, 1), new Vector3(1, -1, -0.5f) }));
-            OpenTkControl.InvalidateVisual();
         }
 
         public void OpenTkControl_OnRender(TimeSpan delta)

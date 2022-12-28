@@ -8,7 +8,7 @@ using Task6.Interfaces;
 
 namespace Task6.Parameters
 {
-    public class FillColorParams : IParametersProvider<FillColorParams>
+    public class FillColorParams
     {
         public readonly Color4 FirstColor;
         public FillColorParams(Color4 color)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Task6.Interfaces
 {
-    public interface IDrawFigureCommand : IInitializableCommand, INamed
+    public interface IDrawFigureCommand : INamed, IMyCommand
     {
     }
 }

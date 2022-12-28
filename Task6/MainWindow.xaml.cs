@@ -43,6 +43,8 @@ namespace Task6
             DIContainer.standartKernel.Bind<FillColorParams>().ToMethod(context => GetFillColor());
             DIContainer.standartKernel.Bind<SidesCountParams>().ToMethod(context => GetSidesCount());
             DIContainer.standartKernel.Bind<RadiusParams>().ToMethod(context => GetRadius());
+            DIContainer.standartKernel.Bind<Translate>().ToSelf();
+            DIContainer.standartKernel.Bind<Rotate>().ToSelf();
         }
 
         private void InitializeCustom()
@@ -54,8 +56,6 @@ namespace Task6
             this.FillColorComboBox.SetNamedItems(Color4Extension.GetColorWithName());
             HideInputControls();
 
-            paramPairsControl[typeof(RotateParams)] = new[] { RotateStackPanel };
-            paramPairsControl[typeof(TranslateParams)] = new[] { TranslateStackPanel };
             paramPairsControl[typeof(FillColorParams)] = new[] { FillColorComboBox };
             paramPairsControl[typeof(SidesCountParams)] = new[] { FigureFaceStackPanel };
             paramPairsControl[typeof(RadiusParams)] = new[] { RadiusStackPanel }; 
@@ -63,9 +63,6 @@ namespace Task6
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            game.Commands.AddRange(new IMyCommand[] {
-                new SetClearColor() { Color = Color4.DimGray },
-                new Fill() });
             gameControl.InvalidateVisual();
         }
 
@@ -112,6 +109,8 @@ namespace Task6
             {
                 control.Visibility = Visibility.Collapsed;
             }
+            this.RotateStackPanel.Visibility = Visibility.Visible;
+            this.TranslateStackPanel.Visibility = Visibility.Visible;
             this.CommandComboBox.Visibility = Visibility.Visible;
             this.ButtonsStackPanel.Visibility = Visibility.Visible;
         }

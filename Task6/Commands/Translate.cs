@@ -6,19 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Task6.Interfaces;
+using Task6.Parameters;
 
 namespace Task6.Painters
 {
-    public class Translate : IInitializableCommand
+    public class Translate : IMyCommand
     {
-        public double x;
-        public double y;
-        public double z;
         public string CommandName => "Переместить";
+        public TranslateParams TranslateParams { get; }
+
+        public Translate(TranslateParams translateParams)
+        {
+            TranslateParams = translateParams;
+        }
 
         public void Execute()
         {
-            GL.Translate(x, y, z);
+            GL.Translate(TranslateParams.Translate);
         }
     }
 }

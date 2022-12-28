@@ -10,11 +10,10 @@ using Task6.Parameters;
 
 namespace Task6.Commands
 {
-    public class DrawParallelepiped : IDrawFigureCommand, INamed
+    public class DrawParallelepiped : IDrawFigureCommand
     {
         public string Name => "Параллелепипед";
         public Vector3 Sides = new Vector3(1, 1, 1);
-        public Vector2 Direction;
         public PrimitiveType primitiveType = PrimitiveType.Polygon;
         private readonly FillColorParams fillColorParams;
 

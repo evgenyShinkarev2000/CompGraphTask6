@@ -8,7 +8,7 @@ using Task6.Interfaces;
 
 namespace Task6.Parameters
 {
-    public class RotateParams : IParametersProvider<RotateParams>
+    public class RotateParams
     {
         public readonly Vector3 Direction;
         public readonly float Angle;

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Task6.Parameters
 {
-    internal class SidesCountParams
+    public class SidesCountParams
     {
-        public readonly int AngleCount;
+        public readonly int SidesCount;
         public SidesCountParams(int angleCount)
         {
-            AngleCount = angleCount;
+            SidesCount = angleCount;
         }
     }
 }

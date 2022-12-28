@@ -8,7 +8,7 @@ using Task6.Interfaces;
 
 namespace Task6.Parameters
 {
-    public class TranslateParams : IParametersProvider<TranslateParams>
+    public class TranslateParams
     {
         public readonly Vector3 Translate;
         public TranslateParams(Vector3 translate)
